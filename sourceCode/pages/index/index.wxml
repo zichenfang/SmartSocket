@@ -9,6 +9,7 @@ module.exports.len = function(arr) {
 </wxs>
 <button bindtap="openBluetoothAdapter">开始扫描</button>
 <button bindtap="stopBluetoothDevicesDiscovery">停止扫描</button>
+<button bindtap="getBluetoothAdapterState">获取蓝牙状态</button>
 <button bindtap="closeBluetoothAdapter">结束流程</button>
 
 <view class="devices_summary">已发现 {{devices.length}} 个外围设备：</view>
@@ -20,7 +21,7 @@ module.exports.len = function(arr) {
    class="device_item"
    hover-class="device_item_hover">
     <view style="font-size: 16px; color: #333;">{{item.name}}</view>
-    <view style="font-size: 10px">信号强度: {{item.RSSI}}dBm ({{utils.max(0, item.RSSI + 100)}}%)</view>
+    <view style="font-size: 10px">信号强度: {{item.RSSI}}dBm ({{utils.max(0, item.RSSI + 100)}}%)         </view>
     <view style="font-size: 10px">UUID: {{item.deviceId}}</view>
     <view style="font-size: 10px">Service数量: {{utils.len(item.advertisServiceUUIDs)}}</view>
   </view>

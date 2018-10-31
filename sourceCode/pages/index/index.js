@@ -26,16 +26,22 @@ Page({
     connected: false,
     chs: [],
   },
+  //初始化小程序蓝牙模块
   openBluetoothAdapter() {
+    /*初始化小程序蓝牙模块，生效周期为调用wx.openBluetoothAdapter至调用wx.closeBluetoothAdapter或小程序被销毁为止。 */
     wx.openBluetoothAdapter({
       success: (res) => {
         console.log('openBluetoothAdapter success', res)
-
         this.startBluetoothDevicesDiscovery()
       },
       fail: (res) => {
         console.log('openBluetoothAdapter fail',res);
         console.log(' errCode', res.errCode);
+        wx.showModal({
+          title: '蓝牙打开失败',
+          content: '请确认手机蓝牙是否开启',
+          showCancel:false,
+        })
         if (res.errCode === 10001) {
           wx.onBluetoothAdapterStateChange(function (res) {
             console.log('onBluetoothAdapterStateChange', res)
@@ -48,17 +54,29 @@ Page({
     })
   },
   getBluetoothAdapterState() {
+    /**获取本机蓝牙适配器状态 */
     wx.getBluetoothAdapterState({
       success: (res) => {
-        console.log('getBluetoothAdapterState', res)
+        console.log('getBluetoothAdapterState success', res)
+        wx.showModal({
+          title: '获取本机蓝牙适配器状态',
+          content: JSON.stringify(res),
+        });
+        /**discovering	boolean	是否正在搜索设备 */
         if (res.discovering) {
           this.onBluetoothDeviceFound()
-        } else if (res.available) {
+        } 
+        /**available	boolean	蓝牙适配器是否可用 */
+        else if (res.available) {
           this.startBluetoothDevicesDiscovery()
         }
+      },
+      fail :(res) =>{
+        console.log('getBluetoothAdapterState fail', res)
       }
     })
   },
+  /**开始搜寻附近的蓝牙外围设备。注意，该操作比较耗费系统资源，请在搜索并连接到设备后调用 stop 方法停止搜索。 */
   startBluetoothDevicesDiscovery() {
     if (this._discoveryStarted) {
       return
@@ -75,17 +93,19 @@ Page({
   stopBluetoothDevicesDiscovery() {
     wx.stopBluetoothDevicesDiscovery()
   },
+  /**监听寻找到新设备的事件 */
   onBluetoothDeviceFound() {
     wx.onBluetoothDeviceFound((res) => {
       res.devices.forEach(device => {
         if (!device.name && !device.localName) {
-          return
+          return;
         }
         const foundDevices = this.data.devices
         const idx = inArray(foundDevices, 'deviceId', device.deviceId)
         const data = {}
         if (idx === -1) {
           data[`devices[${foundDevices.length}]`] = device
+          console.log('idx === -1',device);
         } else {
           data[`devices[${idx}]`] = device
         }
